@@ -1,0 +1,164 @@
+<script src="js/blockchain-view/blockchain-view.js"></script>
+
+<!-- Main content-->
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="view-header">
+                    <div class="pull-right text-right text-14">
+                        <small>Sinoc Harmony<br>Dashboard<br> <span class="c-white">{{vm.data.appVersion}}</span></small>
+                    </div>
+                    <div class="header-icon">
+                        <i class="pe page-header-icon pe-7s-graph3"></i>
+                    </div>
+                    <div class="header-title">
+                        <h3 class="m-b-xs">Sinoc Harmony</h3>
+                        <small>
+                            Showing recent blockchain blocks
+                        </small>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="panel panel-filled">
+                    <form class="form-horizontal home-info-text panel-body">
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Network:
+                            </div>
+                            <div class="col-sm-6">
+                                {{vm.data.networkName}}
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Genesis:
+                            </div>
+                            <div class="col-sm-6" ng-if="vm.data.featureRpc">
+                                <a href="/terminal#eth_getBlockByNumber%200%20true">{{vm.data.genesisHash}}</a>
+                            </div>
+                            <div class="col-sm-6" ng-if="!vm.data.featureRpc">
+                                <a href="#">{{vm.data.genesisHash}}</a>
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Sync status:
+                            </div>
+                            <div class="col-sm-8">
+                                {{syncStatus}}
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Mine status:
+                            </div>
+                            <div class="col-sm-6">
+                                {{mineStatus}}
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Active peers:
+                            </div>
+                            <div class="col-sm-6">
+                                {{activePeers}}
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                NodeID:
+                            </div>
+                            <div class="col-sm-6" ng-if="vm.data.featureRpc">
+                                <a href="/terminal#admin_nodeInfo">{{vm.data.nodeId}}</a>
+                            </div>
+                            <div class="col-sm-6" ng-if="!vm.data.featureRpc">
+                                <a href="#">{{vm.data.nodeId}}</a>
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                {{vm.data.publicIpLabel}}:
+                            </div>
+                            <div class="col-sm-4">
+                                {{vm.data.publicIp}}
+                            </div>
+                            <div class="col-sm-4">
+                                <a id="testPortsLink" href="#">Test ports</a>
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                Sinoc port:
+                            </div>
+                            <div class="col-sm-8">
+                                {{ethPort}}   <span class="font-sans-serif" data-toggle="tooltip" title="Test result if your TCP port {{ethPort}} is accessible for incoming connections from internet">[<span class="port-test-result">?</span>]</span>
+                            </div>
+                        </div>
+
+                        <div class="home-info-row">
+                            <div class="col-sm-4">
+                                JsonRPC port:
+                            </div>
+                            <div class="col-sm-8">
+                                {{vm.data.rpcPort}}   <span class="font-sans-serif" data-toggle="tooltip" title="Test result if your TCP port {{vm.data.rpcPort}} is accessible for incoming connections from internet">[<span class="port-test-result">?</span>]</span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="panel panel-filled">
+                    <div class="panel-heading">
+                        Top block miners
+                    </div>
+                    <div id="miners-scroll-container" class="panel-body p-t-none">
+                        <div ng-repeat="item in miners">
+                            <div class="bs-example m-b-sm miner-div">
+                                <div class="text-left">
+                                    0x{{item.address}}
+                                    <h4>{{item.count}}</h4>
+                                </div>
+
+                                <ul class="list-inline m-b-none m-l-none">
+                                    <li ng-repeat="n in [] | range:item.count">
+                                        <div class="home-miner-box"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-6 height-100p">
+                <div id="chart-scroll-container" ng-hide="!isLoadingComplete">
+                    <div id="blockchain-chart">
+
+                    </div>
+                </div>
+                <div class="center-container" ng-hide="isLoadingComplete">
+                    <p class="block-import-message">{{syncStatusMessageTop}}</p>
+                    <p class="block-import-message">{{syncStatusMessageBottom}}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- End main content-->

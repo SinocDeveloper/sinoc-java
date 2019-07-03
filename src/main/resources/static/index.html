@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- For Angular routing -->
+    <base href="/">
+
+    <link rel="icon" href="images/Sinoc.png">
+    <link href='//fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+
+    <!-- Page title -->
+    <title>Sinoc Harmony</title>
+
+    <script>
+        window.paceOptions = {
+            restartOnPushState: false,
+            restartOnRequestAfter: false,
+            ajax: false, // disabled
+            document: false, // disabled
+            eventLag: false, // disabled
+//            elements: {
+//                selectors: ['.my-page']
+//            }
+        };
+    </script>
+
+    <script src="js/vendor/stomp.js"></script>
+    <script src="webjars/jquery/2.2.4/dist/jquery.js"></script>
+    <script src="webjars/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+    <script src="webjars/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.js"></script>
+
+    <script src="webjars/bootstrap/3.3.6/dist/js/bootstrap.js"></script>
+
+    <script src="js/vendor/angular-1.5.8.min.js"></script>
+    <!--<script src="webjars/angular/1.5.8/angular.js"></script>-->
+    <script src="webjars/angular-route/1.5.8/angular-route.js"></script>
+    <script src="webjars/angular-animate/1.5.8/angular-animate.js"></script>
+
+    <script src="webjars/sockjs-client/1.1.1/dist/sockjs-1.1.1.min.js"></script>
+    <script src="webjars/filesize/3.2.1/lib/filesize.min.js"></script>
+    <script src="webjars/pace/1.0.2/pace.min.js"></script>
+    <script src="webjars/toastr/2.1.2/toastr.min.js"></script>
+    <script src="webjars/moment/2.14.1/moment.js"></script>
+
+    <!--<script src="webjars/ng-scrollbars/0.0.10/dist/scrollbars.min.js"></script>-->
+    <script src="webjars/underscore/1.8.3/underscore-min.js"></script>
+    <script src="webjars/d3/3.5.17/d3.min.js"></script>
+    <script src="webjars/bignumber.js/2.4.0/bignumber.min.js"></script>
+    <!--<script src="webjars/bignumber.js/bignumber.min.js"></script>-->
+
+    <!-- Vendor styles -->
+    <link rel="stylesheet" href="webjars/font-awesome/4.6.3/css/font-awesome.css"/>
+    <link rel="stylesheet" href="webjars/animate.css/3.5.2/animate.css"/>
+    <link rel="stylesheet" href="webjars/bootstrap/3.3.6/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="webjars/toastr/2.1.2/toastr.min.css"/>
+    <link rel="stylesheet" href="webjars/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.css"/>
+
+    <!-- App styles -->
+    <link rel="stylesheet" href="styles/pe-icons/pe-icon-7-stroke.css"/>
+    <link rel="stylesheet" href="styles/pe-icons/helper.css"/>
+    <link rel="stylesheet" href="styles/stroke-icons/style.css"/>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/login.css">
+</head>
+<body ng-app="HarmonyApp" ng-cloak>
+
+<!-- Wrapper-->
+<div class="wrapper" ng-controller="AppCtrl as vm">
+
+    <!-- Header-->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div id="mobile-menu">
+                    <div class="left-nav-toggle">
+                        <a href="/">
+                            <i class="stroke-hamburgermenu"></i>
+                        </a>
+                    </div>
+                </div>
+                <a class="navbar-brand main-logo" href="/">
+                    <!--<img src="images/harmony-title.svg" onerror="this.src='images/harmony-logo.png'"/>-->
+                   <!-- <img src="images/large_EH_logo.png"/> --> 
+                   <img src="images/sinoc_logo.png" style="margin-left:10px;"/>
+                </a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <div class="left-nav-toggle">
+                    <a href="">
+                        <i class="stroke-hamburgermenu"></i>
+                    </a>
+                </div>
+
+                <div class="topbar m-b-none" ng-cloak ng-show="syncStateReceived">
+
+                    <div ng-if="isSyncOff">
+                        <div class="tp-panel m-r-sm">
+                            <div class="tp-title m-r-sm">Sync is disabled</div>
+                        </div>
+                    </div>
+
+                    <div ng-if="isLoadingState && !isSyncOff">
+                        <div class="fast-sync-boxes panel tp-panel m-r-sm">
+                            <div class="tp-title m-r-sm">Fast Sync</div>
+                            <div class="c-text m-r-sm" ng-hide="isLoadingStateWithBlocks">({{loadingStateSpeed}} nodes/sec)</div>
+                            <div class="flex-justify-center flex-align-center">
+                                <div class="progress active">
+                                    <div class="progress-bar progress-bar-sync progress-bar-striped"
+                                         ng-style="{'width' : loadingItemsProgress + '%' }">
+                                    </div>
+                                </div>
+                                <div class="small m-t-xs" style="text-align: center;">{{syncProgressMessage}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loading-boxes panel tp-panel m-r-sm" ng-if="!isLoadingState && !isSyncComplete && !isRegularSync && !isSyncOff">
+
+                        <div class="progress m-t-xs">
+                            <div class="progress-bar progress-bar-sync"
+                                 role="progressbar"
+                                 ng-style="{'width' : loadingItemsProgress + '%' }">
+                            </div>
+                        </div>
+                        <div class="small m-t-xs">{{syncProgressMessage}}</div>
+                    </div>
+
+                    <div class="panel tp-panel" ng-show="!isLoadingState || isLoadingStateWithBlocks">
+                        <div class="panel-body" data-toggle="tooltip" title="Created at {{vm.data.lastBlockTimeString}}">
+                            <span class="m-b-none">
+                                #<span id="blockCounter" class="tp-title">0</span> ({{vm.data.lastBlockTimeMoment}})
+                            </span>
+                            <div class="top-bar-line"></div>
+                            <div class="small">Last Block Imported</div>
+                        </div>
+                    </div>
+
+                    <div class="panel tp-panel" ng-show="!isLoadingState || isLoadingStateWithBlocks">
+                        <div class="panel-body">
+                            <span class="m-b-none tp-title">
+                                {{vm.data.lastBlockTransactions}}
+                            </span>
+                            <div class="top-bar-line"></div>
+                            <div class="small">Transactions</div>
+                        </div>
+                    </div>
+
+                    <div class="panel tp-panel" ng-show="!isLoadingState || isLoadingStateWithBlocks">
+                        <div class="panel-body">
+                            <span class="m-b-none tp-title">
+                                {{vm.data.difficulty}}
+                            </span>
+                            <div class="top-bar-line"></div>
+                            <div class="small">Difficulty</div>
+                        </div>
+                    </div>
+
+                    <div class="panel tp-panel" ng-show="!isLoadingState || isLoadingStateWithBlocks">
+                        <div class="panel-body">
+                            <span class="m-b-none tp-title">
+                                {{vm.data.gasPrice}}
+                            </span>
+                            <div class="top-bar-line"></div>
+                            <div class="small">Recommended Gas Price</div>
+                        </div>
+                    </div>
+
+                    <div class="panel tp-panel" ng-show="!isLoadingState || isLoadingStateWithBlocks">
+                        <div class="panel-body">
+                            <span class="m-b-none tp-title">
+                                {{vm.data.networkHashRate}}
+                            </span>
+                            <div class="top-bar-line"></div>
+                            <div class="small">Avg Hash Rate</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <!-- End header-->
+
+    <!-- NAVIGATION-->
+    <aside class="navigation">
+        <nav class="height-100p">
+            <ul class="nav luna-nav">
+                <li ng-class="{active: vm.data.currentPage == '/'}">
+                    <a href="/">Home</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/peers'}">
+                    <a href="/peers">Sinoc Peers</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/systemLog'}">
+                    <a href="/systemLog">System Logs</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/rpcUsage'}">
+                    <a href="/rpcUsage">JSON-RPC Usage</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/terminal'}" ng-show="vm.data.featureRpc" ng-cloak>
+                    <a href="/terminal">Terminal</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/wallet'}">
+                    <a href="/wallet">Wallet</a>
+                </li>
+
+                <li ng-class="{active: vm.data.currentPage == '/contracts'}" ng-show="vm.data.featureContracts" ng-cloak>
+                    <a href="/contracts">Contracts</a>
+                </li>
+
+                <div class="text-center m-l-md m-r-md m-t-lg" ng-cloak ng-hide="!vm.data.privateNetwork">
+                    <h5 class="c-yellow"><i class="fa fa-gears m-r-sm"></i>Private network</h5>
+                    <small>Peer discovery is disabled</small>
+                    <br>
+                    <small>Mining is auto started</small>
+                </div>
+
+
+                <!-- INSTANT STATS -->
+                <li class="nav-info instant-stats">
+
+                    <h5 class="m-t-md m-b-xs v-c">
+                        <i class="pe pe-7s-shield text-warning"></i>
+                        Harmony Health
+                    </h5>
+                    <!--pe pe-7s-global text-warning-->
+
+                    <!-- CPU -->
+                    <div class="m-t-xs">
+                        CPU usage: <span class="c-white" ng-cloak>{{vm.data.cpuUsage}} %</span>
+                    </div>
+                    <div class="">
+                        <div class="progress m-t-xs full progress-small">
+                            <div id="cpuUsageProgress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" role="progressbar" class="width-0p progress-bar progress-bar-warning">
+                                <span class="sr-only">{{vm.data.cpuUsage}}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory -->
+                    <div class="m-t-xs">
+                        Memory usage: <span class="c-white" ng-cloak>{{vm.data.memoryOccupied}}</span>
+                    </div>
+                    <div class="">
+                        <div class="progress m-t-xs full progress-small">
+                            <div id="memoryUsageProgress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" role="progressbar" class="width-0p progress-bar progress-bar-warning">
+                                <span class="sr-only">{{vm.data.memoryOccupied}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disk -->
+                    <div class="m-t-xs">
+                        DB size: <span class="c-white" ng-cloak>{{vm.data.diskOccupied}}</span>
+                    </div>
+                    <div class="">
+                        <div class="progress m-t-xs full progress-small">
+                            <div id="diskUsageProgress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" role="progressbar" class="width-0p progress-bar progress-bar-warning">
+                                <span class="sr-only">{{vm.data.diskOccupied}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="m-t-xl" data-toggle="tooltip" title="{{vm.data.ethereumJBuildInfo}}">
+                        <small>
+                            Sinoc Harmony <span class="c-white m-l-xs">{{vm.data.appVersion}}</span>
+                        </small>
+                        <br>
+                        <small>
+                            <small>Sinoc <span class="c-white m-l-xs">{{vm.data.ethereumJVersion}}</span></small>
+                        </small>
+                    </div>
+
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <!-- End NAVIGATION-->
+
+    <!-- MAIN CONTENT AND INJECTED VIEWS -->
+    <div id="main">
+
+        <!-- angular templating -->
+        <!-- this is where content will be injected -->
+        <div ng-view></div>
+
+    </div>
+
+</div>
+<!-- End wrapper-->
+
+<!-- App scripts -->
+<script src="js/vendor/luna.js"></script>
+<script src="js/vendor/ansi_up.js"></script>
+<script src="js/vendor/ng-stomp.js"></script>
+<script src="js/app/util/secureRandUtil.js"></script>
+<script src="js/app/util/generateWord.js"></script>
+<script src="js/app/util/scope.util.js"></script>
+
+<script src="js/app/app.controller.js"></script>
+<script src="js/app/login.controller.js"></script>
+<script src="js/app/rest.factory.js"></script>
+<script src="js/app/home.controller.js"></script>
+<script src="js/app/wallet.controller.js"></script>
+<script src="js/app/systemLog.controller.js"></script>
+<script src="js/app/peers.controller.js"></script>
+<script src="js/app/rpcUsage.controller.js"></script>
+<script src="js/app/terminal.controller.js"></script>
+<script src="js/app/contracts.controller.js"></script>
+<script src="js/app/contract.new.controller.js"></script>
+<script src="js/app/popups.controller.js"></script>
+<script src="js/vendor/angular-jsonrpc-client.js"></script>
+<script src="js/vendor/angular-modal-service.js"></script>
+<script src="js/vendor/showErrors.js"></script>
+
+<!--<script src="js/eth/rlp.js"></script>-->
+<script src="js/eth/eth-util.js"></script>
+<script src="js/eth/rlpBuilder.js"></script>
+<!--<script src="js/eth/eth-utils.js"></script>-->
+
+
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<div class="modal fade" id="sendAmountModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Send amount</h4>
+            </div>
+            <div class="modal-body">
+                <form name="form" novalidate>
+                    <div class="form-group">
+                        <label>From address</label>
+                        <input class="form-control" placeholder="{{txData.fromAddress}}" readonly type="text" tabindex="-1">
+                    </div>
+                    <div class="form-group" show-errors>
+                        <label>To address</label>
+                        <input name="toAddress" class="form-control" ng-model="txData.toAddress"
+                               ethaddress
+                               ethaddresschecksum
+                               auto111focus
+                               type="text" required>
+                        <div ng-show="form.$submitted || form.toAddress.$touched">
+                            <div ng-show="form.toAddress.$error.required">Address is required</div>
+                            <div ng-show="form.toAddress.$error.ethaddress">Address format is invalid</div>
+                            <div ng-show="form.toAddress.$error.ethaddresschecksum">Checksum address format is invalid</div>
+                        </div>
+
+                    </div>
+                    <div class="form-group" show-errors>
+                        <label>ETH amount</label><span class="m-l-md">Total available for transfer <a href="#" ng-click="onSendAll()" tabindex="-1">{{txData.availableAmount}}</a></span>
+                        <input name="amount" class="form-control" ng-model="txData.amount"
+                               type="number"
+                               ng-min="0.0001"
+                               ng-max="txData.availableAmount"
+                               autocomplete="off"
+                               required>
+
+                        <div ng-show="form.$submitted || form.amount.$touched">
+                            <div ng-show="form.amount.$error.required">Please enter amount</div>
+                            <div ng-show="form.amount.$error.min">Amount should be more than zero</div>
+                            <div ng-show="form.amount.$error.max">Not enough funds on sender account</div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="form-group wallet-sign-group">
+                        <label ng-show="txData.hasKeystoreKey" ng-class="{cWhite : txData.signType == SIGNTYPE_KEYSTORE}">
+                            <input type="radio" ng-model="txData.signType" ng-value="SIGNTYPE_KEYSTORE" >
+                            Keystore password
+                        </label>
+                        <span class="m-r-md" ng-show="txData.hasKeystoreKey"/>
+                        <label ng-class="{cWhite : txData.signType == SIGNTYPE_PRIVATE}">
+                            <input type="radio" ng-model="txData.signType" ng-value="SIGNTYPE_PRIVATE">
+                            Private key or seed phrase
+                        </label>
+                        <!--<span class="m-r-md"/>-->
+                        <!--<label ng-class="{cWhite : txData.signType == SIGNTYPE_PHRASE}">-->
+                            <!--<input type="radio" ng-model="txData.signType" ng-value="SIGNTYPE_PHRASE">-->
+                            <!--Mnemonic phrase-->
+                        <!--</label>-->
+                    </div>
+                    <div class="form-group" ng-show="txData.signType == SIGNTYPE_KEYSTORE">
+                        Enter keystore password which you used to create this address. Private key is kept on server in sharable storage.
+                    </div>
+                    <div class="form-group" ng-show="txData.signType == SIGNTYPE_PRIVATE">
+                        Paste plain key here or enter sha3 seed words.
+                    </div>
+                    <!--<div class="form-group" ng-show="txData.signType == SIGNTYPE_PHRASE">-->
+                        <!--Select this if you imported address using address mnemonic phrase.-->
+                    <!--</div>-->
+                    <div class="form-group" show-errors>
+                        <textarea name="secret" class="form-control" rows="3" ng-model="txData.secret"
+                                  placeholder="secret"
+                                  autocomplete="off"
+                                  required></textarea>
+
+                        <div ng-show="form.$submitted || form.secret.$touched">
+                            <div ng-show="form.secret.$error.required">Secret is required</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-click="onSignAndSend()">Sign and send</button>
+            </div>
+        </div>
+    </div>
+</div>

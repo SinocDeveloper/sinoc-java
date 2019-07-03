@@ -1,0 +1,79 @@
+<section class="content height-100p">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="view-header">
+
+                <div class="m-l-sm pull-right text-right rpc-filter-div">
+                    <form class="navbar-form navbar-right" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control query" placeholder="Filter by name" tabindex="1"
+                                   ng-model="filterWord"/>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="header-icon">
+                    <i class="pe page-header-icon pe-7s-graph3"></i>
+                </div>
+
+                <div class="header-title">
+                    <h3 class="m-b-xs">Json-Rpc API Usage</h3>
+                    <small>
+                        Displaying JSON-RPC protocol tracing.
+                    </small>
+                </div>
+
+            </div>
+
+            <hr>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="rpc-scroll-container">
+        <ul class="table peers-table">
+
+            <il ng-repeat="item in rpcItems | rpcItemFilter:filterWord"
+                ng-cloak>
+                <div class="panel panel-dark-filled">
+                    <div class="panel-heading p-b-none p-t-none">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <u><h4 class="font-weight-normal">{{item.methodName}}</h4></u>
+                            </div>
+                            <div class="col-sm-3">
+                                <h5 class="font-weight-normal" ng-show="item.count &gt; 0">Invoked: {{item.count}}</h5>
+                            </div>
+                            <div class="col-sm-3 m-l-none">
+                                <h5 class="font-weight-normal" ng-show="item.lastTime">Last call: {{item.lastTime}}</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer p-b-none p-t-none">
+                        <div class="rpc-item-header" ng-show="item.lastResult != null">
+                            <a href="#" ng-click="showLastResult(item)">
+                                <div class="header-icon m-r-md" style="margin-right: 8px;">
+                                    <i class="pe page-header-icon pe-7s-plus"></i>
+                                </div>
+                                <div class="header-title m-l-md"><h5 class="rpc-item-text">Last Result</h5>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="rpc-item-result-{{item.methodName}}" ng-show="item.lastResult != null && item.isLastResultVisible">
+                            <pre class="panel panel-black-filled rpc-item-result">{{item.lastResult | json}}</pre>
+                        </div>
+
+                        <div class="rpc-item-header flex-row flex-align-center rpc-usage">
+                                <div class="header-icon m-l-none m-r-xs">
+                                    <i class="pe page-header-icon pe-7s-study"></i>
+                                </div>
+                            <pre class="panel panel-black-filled m-t-xs m-b-xs">{{item.curl}} <span>{{item.curlUrl}}</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </il>
+        </ul>
+    </div>
+
+</section>

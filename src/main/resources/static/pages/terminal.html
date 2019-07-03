@@ -1,0 +1,93 @@
+<section class="content height-100p">
+
+    <!-- Addition resources -->
+    <!--<script src="js/vendor/jquery.mousewheel.min.js"></script>-->
+    <link href="styles/jquery.terminal.css" rel="stylesheet"/>
+    <!--<script src="bower_components/jquery.terminal/js/jquery.terminal-0.10.12.js"></script>-->
+    <script src="js/vendor/jquery.terminal-0.8.8_custom.js"></script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="view-header">
+
+                <div class="header-icon">
+                    <i class="pe page-header-icon pe-7s-monitor"></i>
+                </div>
+
+                <div class="header-title">
+                    <h3 class="m-b-xs">Terminal</h3>
+                    <small>
+                        Allows to interact with local node via commands.
+                    </small>
+                </div>
+
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9">
+            <div id="terminal-parent">
+                <div id="terminal-container">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-filled">
+                <div ng-hide="hideCommandInfo" class="panel-body">
+                    <span>{{commandInfoName}}</span>
+                    <p class="c-accent">{{commandInfoParams}}</p>
+                </div>
+                <div id="suggestion-scroll-container" ng-hide="hideSuggestionsList">
+                    <ul class="panel-body suggestion-item">
+                        <li ng-repeat="item in filteredSuggestions">{{item}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button trigger modal -->
+    <!--<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">-->
+        <!--Launch demo modal-->
+    <!--</button>-->
+
+    <!-- Modal -->
+    <div class="modal fade" id="signWithKeyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Send transaction</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label>From address</label>
+                            <input class="form-control" placeholder="{{txData.fromAddress}}" readonly type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>To address</label>
+                            <input class="form-control" placeholder="{{txData.toAddress}}" readonly type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>Value</label>
+                            <input class="form-control" placeholder="{{txData.value}}" readonly type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>Private key or seed phrase</label>
+                            <textarea id="pkeyInput" class="form-control" rows="3" placeholder="" autocomplete="off"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="onSignAndSend()">Sign and send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

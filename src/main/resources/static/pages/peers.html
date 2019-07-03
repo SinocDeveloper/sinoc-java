@@ -1,0 +1,143 @@
+<section class="content">
+
+    <script src="webjars/topojson/1.6.26/topojson.min.js"></script>
+    <script src="webjars/datamaps/0.5.7/dist/datamaps.world.min.js"></script>
+
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="view-header">
+                        <div class="header-icon">
+                            <i class="pe page-header-icon pe-7s-world"></i>
+                        </div>
+
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Sinoc Peers</h3>
+                            <small>
+                                Displaying peers' info in Sinoc network and their location.
+                            </small>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+
+
+            <div class="col-lg-5">
+
+                <div class="panel">
+                    <div class="panel-body">
+
+                        <h4 class="m-t-n-sm m-b-xs">Peers location</h4>
+                        <span>Connected to <span class="c-white">{{activePeersCount}}</span> peers. Total detected <span class="c-white">{{peersCount}}</span></span>
+
+                        <div id="serverMap">
+                            <div class="datamaps-hoverover"></div>
+                        </div>
+
+                        <div class="row" align="center" style="height: 50px;">
+                            <div class="datamaps-legend">
+                                <dl>
+                                    <dt>Country with peers:</dt>
+                                    <dd style="background-color:#CA8800">&nbsp;</dd>
+
+                                    <dt>New peer detected: </dt>
+                                    <dd style="background-color:#FFF108">&nbsp;</dd>
+
+                                    <dt>Block received: </dt>
+                                    <dd style="margin-top: 3px;width:10px;height:10px;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;border:1px solid #FFFFFF;background-color:#FF0000;">&nbsp;</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-filled" ng-hide="hidePeerDetails">
+                            <div class="panel-body text-left peer-details">{{peerDetails}}</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="panel panel-filled">
+                    <div class="panel-body">
+
+                        <form class="navbar-form" role="search">
+                            <ul class="list-inline">
+                                <li>
+                                    <div class="checkbox">
+                                        <label class="font-16">
+                                            <input type="checkbox"
+                                                   ng-model="showInactive"
+                                                   ng-change="onShowInactiveChange()">
+                                            Show Non-Active Nodes
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </form>
+
+                        <div class="table-responsive" id="peers-scroll-container">
+                            <table class="table peers-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Node ID
+                                        </th>
+                                        <th>
+                                            IP
+                                        </th>
+                                        <th class="text-left">
+                                            Geo
+                                        </th>
+                                        <th class="text-right">
+                                            Last Ping
+                                        </th>
+                                        <th class="text-right">
+                                            Ping Latency
+                                        </th>
+                                        <th class="text-right">
+                                            Reputation
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr ng-repeat="peer in peers | filter: { isActive: !showInactive }"
+                                        ng-click="onClickPeer(peer)"
+                                        ng-mouseover="onOverPeer(peer)"
+                                        ng-mouseout="onOutPeer(peer)"
+                                        ng-cloak
+                                        ng-class="{'peer-active': peer.isActive}"
+                                        class="peer-row">
+                                        <td data-toggle="tooltip" title="{{peer.nodeId}}">
+                                            0x{{peer.nodeId | limitTo : 12 : 0}}...
+                                        </td>
+                                        <td>{{peer.ip}}</td>
+                                        <td class="p-t-none p-b-none" data-toggle="tooltip" title="{{peer.country3Code}}">
+                                            <ul class="f16 m-l-xs m-t-sm">
+                                                <li class="flag {{peer.country2Code | lowercase}}"></li>
+                                            </ul>
+                                        </td>
+                                        <td class="text-right">{{peer.lastPing}}</td>
+                                        <td class="text-right">{{peer.pingLatency == 0 ? '' : peer.pingLatency + ' ms'}}</td>
+                                        <td class="text-right">{{peer.reputation}}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>

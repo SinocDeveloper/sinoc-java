@@ -1,0 +1,91 @@
+
+<!-- Main content-->
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="view-header">
+
+                    <div class="pull-right text-right text-14">
+                        <h3>{{totalAmountString}} Sinoc</h3>
+                        <p>${{totalAmountUSD}}</p>
+                    </div>
+
+                    <div class="header-icon">
+                        <i class="pe page-header-icon pe-7s-wallet"></i>
+                    </div>
+                    <div class="header-title">
+                        <h3 class="m-b-xs">Wallet</h3>
+                        <small>
+                            Allows to receive and send ETH
+                        </small>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-lg-12">
+                <div class="panel panel-filled">
+
+                    <div class="panel-heading">
+                         My Wallet Addresses
+                    </div>
+
+                    <div class="panel-heading">
+                        <a href="#" ng-click="onNewAddress()" class="btn btn-w-md btn-primary"><span class="pe-7s-key m-r-sm"></span>New address in keystore</a>
+                        <span class="m-l-sm"/>
+                        <a href="#" ng-click="onPhraseAddress()" class="btn btn-w-md btn-primary">New mnemonic address</a>
+                        <span class="m-l-sm"/>
+                        <a href="#" ng-click="onImportAddress()" class="btn btn-w-md btn-primary"><i class="fa fa-eye m-r-sm"/>Import address</a>
+                    </div>
+
+                    <div class="table-responsive" id="address-scroll-container">
+                        <table class="table">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in addresses"
+                                    >
+                                    <td>
+                                        <span class="pe-7s-key m-l-sm" ng-hide="!item.hasKeystoreKey"></span>
+                                    </td>
+                                    <td>
+                                        {{item.name}}
+                                    </td>
+                                    <td>
+                                        <div class="font-monospace">{{item.publicAddress}}</div>
+                                    </td>
+                                    <td>
+                                        <span class="c-white">{{item.amountString}}</span> <span data-toggle="tooltip" title="Pending amount">{{item.pendingAmountString}}</span>
+                                    </td>
+                                    <td>
+                                       <a href="#" ng-click="onSendClick(item)">Send Amount</a>
+                                    </td>
+                                    <td>
+                                        <a href="#" ng-click="onRemoveClick(item)">Remove Address</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel panel-filled">
+                    <div class="panel-heading">
+                        Last Transactions
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+<!-- End main content-->
+
+

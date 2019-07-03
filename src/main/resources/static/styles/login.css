@@ -1,0 +1,23 @@
+ .login-page{
+ 	padding:0px;
+ }
+ .login{
+    border-radius: 20px;
+    width: 60%;
+    height: 66%;
+    transform: translate(-50%,-50%);
+   	margin: 27% 50%;
+
+    background-image:url(../images/bg_login.jpg); 
+    background-repeat:no-repeat; 
+	background-size:100% 100%;
+}
+
+ .login .login_from{
+	padding: 22% 33%;
+}
+
+ .login .form-control{
+	margin-bottom: 5px;
+	background-color: #000000;
+}
