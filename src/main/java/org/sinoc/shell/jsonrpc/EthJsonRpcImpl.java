@@ -1029,6 +1029,12 @@ public class EthJsonRpcImpl implements JsonRpc {
 				addr.add(hexToByteArray(s));
 			}
 			logFilter.withContractAddress(addr.toArray(new byte[0][]));
+		}else if (fr.address instanceof List) {
+			List<byte[]> addr = new ArrayList<>();
+			for (Object s : ((List<?>) fr.address)) {
+				addr.add(hexToByteArray(String.valueOf(s)));
+			}
+			logFilter.withContractAddress(addr.toArray(new byte[0][]));
 		}
 
 		if (fr.topics != null) {
