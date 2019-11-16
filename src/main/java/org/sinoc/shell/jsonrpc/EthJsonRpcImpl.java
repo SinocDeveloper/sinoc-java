@@ -13,7 +13,6 @@ import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -24,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +84,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
 @Service
@@ -211,7 +210,8 @@ public class EthJsonRpcImpl implements JsonRpc {
 	AtomicInteger filterCounter = new AtomicInteger(1);
 	Map<Integer, Filter> installedFilters = new Hashtable<>();
 	Map<ByteArrayWrapper, TransactionReceipt> pendingReceipts = Collections.synchronizedMap(new LRUMap<>(1024));
-
+	Map<ByteArrayWrapper, SettableFuture<TransactionReceipt>> noticePendingOrDropReceipts = Collections.synchronizedMap(new LRUMap<>(1024));
+	
 	Map<ByteArrayWrapper, Block> miningBlocks = new ConcurrentHashMap<>();
 
 	volatile Block miningBlock;
@@ -247,6 +247,13 @@ public class EthJsonRpcImpl implements JsonRpc {
 					pendingReceipts.put(txHashW, txReceipt);
 					for (Filter filter : installedFilters.values()) {
 						filter.updatePendingTx(txReceipt);
+					}
+					SettableFuture<TransactionReceipt> notice = noticePendingOrDropReceipts.get(txHashW);
+					if(notice!=null) {
+						if(!notice.isDone() && !notice.isCancelled()) {
+							notice.set(txReceipt);
+						}
+						noticePendingOrDropReceipts.remove(txHashW);
 					}
 				} else {
 					pendingReceipts.remove(txHashW);
@@ -546,12 +553,18 @@ public class EthJsonRpcImpl implements JsonRpc {
 	}
 
 	public String eth_sendRawTransaction(String rawData) throws Exception {
-				Transaction tx = new Transaction(hexToByteArray(rawData));
-
-        tx.rlpParse();
-        validateAndSubmit(tx);
-
-        return TypeConverter.toJsonHex(tx.getHash());
+		Transaction tx = new Transaction(hexToByteArray(rawData));
+		ByteArrayWrapper txHashW = new ByteArrayWrapper(tx.getHash());
+		SettableFuture<TransactionReceipt> notice = SettableFuture.create();
+		noticePendingOrDropReceipts.put(txHashW, notice);
+		tx.rlpParse();
+		validateAndSubmit(tx);
+		TransactionReceipt tr = notice.get(30, TimeUnit.SECONDS);
+		if(StringUtils.isEmpty(tr.getError())) {
+			return TypeConverter.toJsonHex(tx.getHash());
+		}else {
+			throw new RuntimeException(tr.getError());
+		}
 	}
 
 	protected void validateAndSubmit(Transaction tx) {
@@ -1138,7 +1151,6 @@ public class EthJsonRpcImpl implements JsonRpc {
 		/*if (!minerInitialized) {
 			minerInitialized = true;
 			// this should initialize miningBlock
-			blockMiner.setExternalMiner(externalMiner);
 		}
 
 		final Block block = miningBlock;
