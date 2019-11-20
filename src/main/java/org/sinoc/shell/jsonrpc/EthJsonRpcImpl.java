@@ -248,15 +248,15 @@ public class EthJsonRpcImpl implements JsonRpc {
 					for (Filter filter : installedFilters.values()) {
 						filter.updatePendingTx(txReceipt);
 					}
-					SettableFuture<TransactionReceipt> notice = noticePendingOrDropReceipts.get(txHashW);
-					if(notice!=null) {
-						if(!notice.isDone() && !notice.isCancelled()) {
-							notice.set(txReceipt);
-						}
-						noticePendingOrDropReceipts.remove(txHashW);
-					}
 				} else {
 					pendingReceipts.remove(txHashW);
+				}
+				SettableFuture<TransactionReceipt> notice = noticePendingOrDropReceipts.get(txHashW);
+				if(notice!=null) {
+					if(!notice.isDone() && !notice.isCancelled()) {
+						notice.set(txReceipt);
+					}
+					noticePendingOrDropReceipts.remove(txHashW);
 				}
 			}
 		});
