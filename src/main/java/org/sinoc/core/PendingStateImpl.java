@@ -8,7 +8,6 @@ import static org.sinoc.util.ByteUtil.toHexString;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -20,8 +19,8 @@ import org.sinoc.db.BlockStore;
 import org.sinoc.db.ByteArrayWrapper;
 import org.sinoc.db.TransactionStore;
 import org.sinoc.listener.EthereumListener;
-import org.sinoc.listener.EthereumListenerAdapter;
 import org.sinoc.listener.EthereumListener.PendingTransactionState;
+import org.sinoc.listener.EthereumListenerAdapter;
 import org.sinoc.util.ByteUtil;
 import org.sinoc.util.FastByteComparisons;
 import org.sinoc.vm.program.invoke.ProgramInvokeFactory;
@@ -126,7 +125,11 @@ public class PendingStateImpl implements PendingState {
         }
         return best;
     }
-
+    
+    private void delInvalidTxExist(Transaction tx) {
+    	receivedTxs.remove(new ByteArrayWrapper(tx.getHash()));
+    }
+    
     private boolean addNewTxIfNotExist(Transaction tx) {
         return receivedTxs.put(new ByteArrayWrapper(tx.getHash()), dummyObject) == null;
     }
@@ -145,6 +148,9 @@ public class PendingStateImpl implements PendingState {
                 unknownTx++;
                 if (addPendingTransactionImpl(tx)) {
                     newPending.add(tx);
+                }else {
+                	delInvalidTxExist(tx);
+                	unknownTx--;
                 }
             }
         }
