@@ -555,15 +555,19 @@ public class EthJsonRpcImpl implements JsonRpc {
 	public String eth_sendRawTransaction(String rawData) throws Exception {
 		Transaction tx = new Transaction(hexToByteArray(rawData));
 		ByteArrayWrapper txHashW = new ByteArrayWrapper(tx.getHash());
-		SettableFuture<TransactionReceipt> notice = SettableFuture.create();
-		noticePendingOrDropReceipts.put(txHashW, notice);
-		tx.rlpParse();
-		validateAndSubmit(tx);
-		TransactionReceipt tr = notice.get(30, TimeUnit.SECONDS);
-		if(StringUtils.isEmpty(tr.getError())) {
-			return TypeConverter.toJsonHex(tx.getHash());
+		if(pendingState.isTxreceived(txHashW)) {
+			throw new RuntimeException("repeated transaction received: " + ByteUtil.toHexString(tx.getHash()));
 		}else {
-			throw new RuntimeException(tr.getError());
+			SettableFuture<TransactionReceipt> notice = SettableFuture.create();
+			noticePendingOrDropReceipts.put(txHashW, notice);
+			tx.rlpParse();
+			validateAndSubmit(tx);
+			TransactionReceipt tr = notice.get(30, TimeUnit.SECONDS);
+			if(StringUtils.isEmpty(tr.getError())) {
+				return TypeConverter.toJsonHex(tx.getHash());
+			}else {
+				throw new RuntimeException(tr.getError());
+			}
 		}
 	}
 

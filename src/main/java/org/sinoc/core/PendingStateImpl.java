@@ -133,6 +133,10 @@ public class PendingStateImpl implements PendingState {
     private boolean addNewTxIfNotExist(Transaction tx) {
         return receivedTxs.put(new ByteArrayWrapper(tx.getHash()), dummyObject) == null;
     }
+    
+    public boolean isTxreceived(ByteArrayWrapper txHash) {
+    	return receivedTxs.get(txHash) != null;
+    }
 
     @Override
     public void addPendingTransaction(Transaction tx) {
